@@ -68,6 +68,7 @@ Secret message is: 'You can find the source code here: https://github.com/docker
 # Start a ubuntu image with the process sh -c 'echo "Input website:"; read website; echo "Searching.."; sleep 1; curl http://$website;'
 # Test inputting helsinki.fi into the application; and fix the ensuing problems.
 % docker run -d -it --name exercise14 ubuntu sh -c 'apt-get update; apt-get install curl -y; echo "Input website:"; read website; echo "Searching.."; sleep 1; curl -v http://$website;' ; docker attach exercise14
+........logs of installing curl here.......
 Input website:
 www.helsinki.fi
 Searching..
