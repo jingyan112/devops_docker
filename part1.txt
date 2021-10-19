@@ -63,3 +63,29 @@ Secret message is: 'You can find the source code here: https://github.com/docker
 2021-10-19 14:14:23 +0000 UTC
 2021-10-19 14:14:25 +0000 UTC
 Secret message is: 'You can find the source code here: https://github.com/docker-hy'
+
+========================================Solution to 1.4: Missing dependencies========================================
+# Start a ubuntu image with the process sh -c 'echo "Input website:"; read website; echo "Searching.."; sleep 1; curl http://$website;'
+# Test inputting helsinki.fi into the application; and fix the ensuing problems.
+% docker run -d -it --name exercise14 ubuntu sh -c 'apt-get update; apt-get install curl -y; echo "Input website:"; read website; echo "Searching.."; sleep 1; curl -v http://$website;' ; docker attach exercise14
+Input website:
+www.helsinki.fi
+Searching..
+*   Trying 128.214.189.90:80...
+* TCP_NODELAY set
+* Connected to www.helsinki.fi (128.214.189.90) port 80 (#0)
+> GET / HTTP/1.1
+> Host: www.helsinki.fi
+> User-Agent: curl/7.68.0
+> Accept: */*
+>
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 301 Moved Permanently
+< Date: Tue, 19 Oct 2021 14:48:24 GMT
+< Server: Varnish
+< X-Varnish: 53674057
+< Location: https://www.helsinki.fi/
+< Content-Length: 0
+< Connection: keep-alive
+<
+* Connection #0 to host www.helsinki.fi left intact
