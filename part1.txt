@@ -1,4 +1,4 @@
-Solution for 1.1: Getting started
+========================================Solution to 1.1: Getting started========================================
 # Start 3 containers from image that does not automatically exit, such as nginx, detached.
 Terminal 1: % docker container run nginx
 Terminal 2: % docker container run httpd
@@ -20,7 +20,7 @@ CONTAINER ID   IMAGE       COMMAND                  CREATED         STATUS      
 bf18afc1b0fb   zookeeper   "/docker-entrypoint.…"   4 minutes ago   Exited (143) 36 seconds ago             stupefied_leavitt
 943f1374f6a3   nginx       "/docker-entrypoint.…"   7 minutes ago   Up 7 minutes                  80/tcp    nice_nightingale
 
-Solution for 1.2: Cleanup
+========================================Solution to 1.2: Cleanup========================================
 # Clean the docker daemon from all images and containers.
 Terminal 4: % docker container stop 943f1374f6a3
 Terminal 4: % docker container prune
@@ -37,3 +37,29 @@ Terminal 4: % docker container ps -a
 CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
 Terminal 4: % docker images
 REPOSITORY   TAG       IMAGE ID   CREATED   SIZE
+
+========================================Solution to 1.3: Secret message========================================
+Image devopsdockeruh/simple-web-service:ubuntu will start a container that outputs logs into a file.
+Go inside the container and use tail -f ./text.log to follow the logs.
+Every 10 seconds the clock will send you a “secret message”.
+Submit the secret message and command(s) given as your answer.
+
+# Start a container with the name of exercise13; -i (interactive), -t (tty) and -d (detached)
+% docker run -d --name exercise13 devopsdockeruh/simple-web-service:ubuntu
+
+# Enter in the container created above
+% docker exec -it exercise13 sh
+# tail -f ./text.log
+Secret message is: 'You can find the source code here: https://github.com/docker-hy'
+2021-10-19 14:14:07 +0000 UTC
+2021-10-19 14:14:09 +0000 UTC
+2021-10-19 14:14:11 +0000 UTC
+2021-10-19 14:14:13 +0000 UTC
+2021-10-19 14:14:15 +0000 UTC
+Secret message is: 'You can find the source code here: https://github.com/docker-hy'
+2021-10-19 14:14:17 +0000 UTC
+2021-10-19 14:14:19 +0000 UTC
+2021-10-19 14:14:20 +0000 UTC
+2021-10-19 14:14:23 +0000 UTC
+2021-10-19 14:14:25 +0000 UTC
+Secret message is: 'You can find the source code here: https://github.com/docker-hy'
