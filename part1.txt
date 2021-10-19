@@ -1,0 +1,39 @@
+Solution for 1.1: Getting started
+# Start 3 containers from image that does not automatically exit, such as nginx, detached.
+Terminal 1: % docker container run nginx
+Terminal 2: % docker container run httpd
+Terminal 3: % docker container run zookeeper
+Terminal 4: % docker container ps -a
+CONTAINER ID   IMAGE       COMMAND                  CREATED              STATUS              PORTS                                    NAMES
+622bb8f53a4c   httpd       "httpd-foreground"       About a minute ago   Up About a minute   80/tcp                                   elastic_rhodes
+bf18afc1b0fb   zookeeper   "/docker-entrypoint.…"   About a minute ago   Up About a minute   2181/tcp, 2888/tcp, 3888/tcp, 8080/tcp   stupefied_leavitt
+943f1374f6a3   nginx       "/docker-entrypoint.…"   4 minutes ago        Up 4 minutes        80/tcp                                   nice_nightingale
+
+# Stop 2 of the containers leaving 1 up.
+Terminal 4: % docker container stop 622bb8f53a4c
+Terminal 4: % docker container stop bf18afc1b0fb
+
+# Submit the output for docker ps -a which shows 2 stopped containers and one running.
+Terminal 4: % docker container ps -a
+CONTAINER ID   IMAGE       COMMAND                  CREATED         STATUS                        PORTS     NAMES
+622bb8f53a4c   httpd       "httpd-foreground"       4 minutes ago   Exited (0) 47 seconds ago               elastic_rhodes
+bf18afc1b0fb   zookeeper   "/docker-entrypoint.…"   4 minutes ago   Exited (143) 36 seconds ago             stupefied_leavitt
+943f1374f6a3   nginx       "/docker-entrypoint.…"   7 minutes ago   Up 7 minutes                  80/tcp    nice_nightingale
+
+Solution for 1.2: Cleanup
+# Clean the docker daemon from all images and containers.
+Terminal 4: % docker container stop 943f1374f6a3
+Terminal 4: % docker container prune
+
+Terminal 4: % docker images
+REPOSITORY   TAG       IMAGE ID       CREATED      SIZE
+zookeeper    latest    043d5ff52cc5   5 days ago   278MB
+httpd        latest    d54056386fbb   6 days ago   138MB
+nginx        latest    87a94228f133   7 days ago   133MB
+Terminal 4: % docker image rm zookeeper httpd nginx
+
+# Submit the output for docker ps -a and docker images
+Terminal 4: % docker container ps -a
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+Terminal 4: % docker images
+REPOSITORY   TAG       IMAGE ID   CREATED   SIZE
