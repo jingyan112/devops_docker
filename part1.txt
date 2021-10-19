@@ -30,7 +30,7 @@ REPOSITORY   TAG       IMAGE ID       CREATED      SIZE
 zookeeper    latest    043d5ff52cc5   5 days ago   278MB
 httpd        latest    d54056386fbb   6 days ago   138MB
 nginx        latest    87a94228f133   7 days ago   133MB
-Terminal 4: % docker image rm zookeeper httpd nginx
+Terminal 4: % docker image rm 043d5ff52cc5 d54056386fbb 87a94228f133
 
 # Submit the output for docker ps -a and docker images
 Terminal 4: % docker container ps -a
