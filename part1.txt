@@ -192,3 +192,22 @@ Searching..
 <h1>Moved Permanently</h1>
 <p>The document has moved <a href="https://www.helsinki.fi/">here</a>.</p>
 </body></html>
+
+========================================Solution to 1.9: Volumes========================================s
+Image devopsdockeruh/simple-web-service creates a timestamp every two seconds to /usr/src/app/text.log when it’s not given a command. 
+Start the container with bind mount so that the logs are created into your filesystem.
+Submit the command you used to complete the exercise.
+
+Terminal 1: % touch /Users/yanjing/Desktop/text.log
+Terminal 1: % tail -f /Users/yanjing/Desktop/text.log
+
+Terminal 2: % docker run -v /Users/yanjing/Desktop/text.log:/usr/src/app/text.log devopsdockeruh/simple-web-service
+Starting log output
+Wrote text to /usr/src/app/text.log
+Wrote text to /usr/src/app/text.log
+...
+
+Check the Terminal 1: % tail -f /Users/yanjing/Desktop/text.log
+2021-10-21 12:59:55 +0000 UTC
+2021-10-21 12:59:57 +0000 UTC
+...
