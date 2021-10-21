@@ -90,3 +90,86 @@ Searching..
 < Connection: keep-alive
 <
 * Connection #0 to host www.helsinki.fi left intact
+
+========================================Solution to 1.5: Sizes of images========================================
+# Pull both images (devopsdockeruh/simple-web-service:ubuntu and devopsdockeruh/simple-web-service:alpine) and compare the image sizes.
+% docker pull devopsdockeruh/simple-web-service:alpine
+% docker pull devopsdockeruh/simple-web-service:ubuntu
+% docker images
+REPOSITORY                          TAG       IMAGE ID       CREATED        SIZE
+devopsdockeruh/simple-web-service   ubuntu    4e3362e907d5   7 months ago   83MB
+devopsdockeruh/simple-web-service   alpine    fd312adc88e0   7 months ago   15.7MB
+
+# Go inside the alpine container and make sure the secret message functionality is the same.
+Terminal 1: % docker run -d --name alpine devopsdockeruh/simple-web-service:alpine
+Terminal 1: % docker exec -it alpine sh
+/usr/src/app # tail -f ./text.log
+Secret message is: 'You can find the source code here: https://github.com/docker-hy'
+2021-10-21 11:37:07 +0000 UTC
+2021-10-21 11:37:09 +0000 UTC
+2021-10-21 11:37:11 +0000 UTC
+2021-10-21 11:37:13 +0000 UTC
+2021-10-21 11:37:15 +0000 UTC
+Secret message is: 'You can find the source code here: https://github.com/docker-hy'
+
+Terminal 2: % docker run -d --name ubuntu devopsdockeruh/simple-web-service:ubuntu
+Terminal 2: % docker exec -it ubuntu sh
+# tail -f /usr/src/app/text.log
+2021-10-21 11:38:26 +0000 UTC
+2021-10-21 11:38:28 +0000 UTC
+Secret message is: 'You can find the source code here: https://github.com/docker-hy'
+2021-10-21 11:38:30 +0000 UTC
+2021-10-21 11:38:32 +0000 UTC
+2021-10-21 11:38:34 +0000 UTC
+2021-10-21 11:38:36 +0000 UTC
+2021-10-21 11:38:38 +0000 UTC
+Secret message is: 'You can find the source code here: https://github.com/docker-hy'
+
+========================================Solution to 1.6: Hello Docker Hub========================================
+Run docker run -it devopsdockeruh/pull_exercise.
+It will wait for your input. Navigate through docker hub to find the docs and Dockerfile that was used to create the image.
+Read the Dockerfile and/or docs to learn what input will get the application to answer a “secret message”.
+Submit the secret message and command(s) given to get it as your answer.
+
+# https://hub.docker.com/r/devopsdockeruh/pull_exercise
+% docker run -it devopsdockeruh/pull_exercise
+Unable to find image 'devopsdockeruh/pull_exercise:latest' locally
+latest: Pulling from devopsdockeruh/pull_exercise
+8e402f1a9c57: Pull complete
+5e2195587d10: Pull complete
+6f595b2fc66d: Pull complete
+165f32bf4e94: Pull complete
+67c4f504c224: Pull complete
+Digest: sha256:7c0635934049afb9ca0481fb6a58b16100f990a0d62c8665b9cfb5c9ada8a99f
+Status: Downloaded newer image for devopsdockeruh/pull_exercise:latest
+Give me the password: basics
+You found the correct password. Secret message is:
+"This is the secret message"
+
+========================================Solution to 1.7: Two line Dockerfile========================================
+Create a Dockerfile and use FROM and CMD to create a brand new image through devopsdockeruh/simple-web-service:alpine that automatically runs the server and tag the new image as “web-server”.
+Return the Dockerfile and the command you used to run the container.
+
+% cat Dockerfile
+From devopsdockeruh/simple-web-service:alpine
+CMD server
+
+% docker build . -t web-server
+
+% docker images
+REPOSITORY                          TAG       IMAGE ID       CREATED        SIZE
+web-server                          latest    978fbf315695   7 months ago   15.7MB
+
+% docker run web-server
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /*path                    --> server.Start.func1 (3 handlers)
+[GIN-debug] Listening and serving HTTP on :8080
+
+% docker container ps -a
+CONTAINER ID   IMAGE                                      COMMAND                  CREATED          STATUS          PORTS     NAMES
+e9fc6fdf78f4   web-server                                 "/usr/src/app/server…"   4 minutes ago    Up 4 minutes              confident_swartz
