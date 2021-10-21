@@ -67,29 +67,18 @@ Secret message is: 'You can find the source code here: https://github.com/docker
 ========================================Solution to 1.4: Missing dependencies========================================
 # Start a ubuntu image with the process sh -c 'echo "Input website:"; read website; echo "Searching.."; sleep 1; curl http://$website;'
 # Test inputting helsinki.fi into the application; and fix the ensuing problems.
-% docker run -d -it --name exercise14 ubuntu sh -c 'apt-get update; apt-get install curl -y; echo "Input website:"; read website; echo "Searching.."; sleep 1; curl -v http://$website;' ; docker attach exercise14
+% docker run -d -it --name exercise14 ubuntu sh -c 'apt-get update; apt-get install curl -y; echo "Input website:"; read website; echo "Searching.."; sleep 1; curl http://$website;' ; docker attach exercise14
 ........logs of installing curl here.......
 Input website:
-www.helsinki.fi
+helsinki.fi
 Searching..
-*   Trying 128.214.189.90:80...
-* TCP_NODELAY set
-* Connected to www.helsinki.fi (128.214.189.90) port 80 (#0)
-> GET / HTTP/1.1
-> Host: www.helsinki.fi
-> User-Agent: curl/7.68.0
-> Accept: */*
->
-* Mark bundle as not supporting multiuse
-< HTTP/1.1 301 Moved Permanently
-< Date: Tue, 19 Oct 2021 14:48:24 GMT
-< Server: Varnish
-< X-Varnish: 53674057
-< Location: https://www.helsinki.fi/
-< Content-Length: 0
-< Connection: keep-alive
-<
-* Connection #0 to host www.helsinki.fi left intact
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>301 Moved Permanently</title>
+</head><body>
+<h1>Moved Permanently</h1>
+<p>The document has moved <a href="https://www.helsinki.fi/">here</a>.</p>
+</body></html>
 
 ========================================Solution to 1.5: Sizes of images========================================
 # Pull both images (devopsdockeruh/simple-web-service:ubuntu and devopsdockeruh/simple-web-service:alpine) and compare the image sizes.
@@ -173,3 +162,33 @@ web-server                          latest    978fbf315695   7 months ago   15.7
 % docker container ps -a
 CONTAINER ID   IMAGE                                      COMMAND                  CREATED          STATUS          PORTS     NAMES
 e9fc6fdf78f4   web-server                                 "/usr/src/app/server…"   4 minutes ago    Up 4 minutes              confident_swartz
+
+========================================Solution to 1.8: Image for script========================================
+Create a Dockerfile for a new image that starts from ubuntu:18.04.
+Make a script file on you local machine with such content as echo "Input website:"; read website; echo "Searching.."; sleep 1; curl http://$website;. 
+Transfer this file to an image and run it inside the container using CMD. Build the image with tag “curler”.
+Run the new curler image with the correct flags and input helsinki.fi into it. Output should match the 1.4 one.
+Return both Dockerfile and the command you used to run the container.
+
+% cat Dockerfile
+From ubuntu:18.04
+CMD apt-get update; apt-get install curl -y;echo "Input website:"; read website; echo "Searching.."; sleep 1; curl http://$website;
+
+% docker build . -t curler
+
+% docker images
+REPOSITORY                          TAG       IMAGE ID       CREATED         SIZE
+curler                              latest    42a9fa72871f   3 minutes ago   116MB
+
+% docker run -it curler
+........logs of installing curl here.......
+Input website:
+helsinki.fi
+Searching..
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>301 Moved Permanently</title>
+</head><body>
+<h1>Moved Permanently</h1>
+<p>The document has moved <a href="https://www.helsinki.fi/">here</a>.</p>
+</body></html>
