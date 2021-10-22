@@ -355,3 +355,5 @@ Submit the edited Dockerfiles and commands used to run.
 # Repeat the steps in 1.13
 # Input "http://127.0.0.1:5000/" in the browser, click "PRESS TO TEST!" button next to "Exercise 1.14" in the website, the following info can be seen:
 "Success! Great job!"
+
+# To summarize, an image name may consist of 3 parts plus a tag. Usually like the following: registry/organisation/image:tag. 
