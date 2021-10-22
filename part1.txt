@@ -251,6 +251,7 @@ COPY spring-example-project .
 RUN ./mvnw package
 CMD java -jar ./target/docker-example-1.1.3.jar
 
+# The two parameters here --no-cache --progress=plain to print all the output during building image
 % docker build . --no-cache --progress=plain -t spring
 
 % docker images
@@ -279,3 +280,34 @@ CONTAINER ID   IMAGE     COMMAND                  CREATED         STATUS        
         <p style="width: fit-content; margin: auto;"></p>
     </body>
 </html>
+
+========================================Solution to 1.12: Hello, frontend!========================================
+Clone, fork or download the project from https://github.com/docker-hy/material-applications/tree/main/example-frontend.
+Create a Dockerfile for the project (example-frontend) and give a command so that the project runs in a docker container with port 5000 exposed and published 
+so when you start the container and navigate to http://localhost:5000 you will see message if you’re successful.
+Submit the Dockerfile.
+
+# Here, I use apt-get cmd to install nodejs rather than the bash script
+% cat Dockerfile
+FROM debian:latest
+WORKDIR /var
+COPY material-applications/example-frontend .
+RUN ls
+RUN apt-get update
+RUN apt-get install curl gcc g++ make yarn nodejs npm -y
+RUN npm -v & node -v
+RUN npm install
+RUN npm run build
+RUN npm install -g serve
+CMD serve -s -l 5000 build
+
+% docker build . --no-cache --progress=plain -t example-frontend
+
+% docker images
+REPOSITORY                          TAG       IMAGE ID       CREATED          SIZE
+example-frontend                    latest    7b9873fd2849   32 seconds ago   1.21GB
+
+% docker run -it -p 5000:5000 --name example-frontend example-frontend
+
+# Input "http://127.0.0.1:5000/" in the browser, and the following info can be seen.
+Exercise 1.12: Congratulations! You configured your ports correctly!
