@@ -311,3 +311,34 @@ example-frontend                    latest    7b9873fd2849   32 seconds ago   1.
 
 # Input "http://127.0.0.1:5000/" in the browser, and the following info can be seen.
 Exercise 1.12: Congratulations! You configured your ports correctly!
+
+========================================Solution to 1.13: Hello, backend!========================================
+Clone, fork or download a project from https://github.com/docker-hy/material-applications/tree/main/example-backend.
+Create a Dockerfile for the project (example-backend) and give a command so that the project runs in a docker container with port 8080 published.
+When you start the container and navigate to http://localhost:8080/ping you should get a “pong” as response.
+Submit the Dockerfile and the command used.
+
+% cat Dockerfile
+FROM debian:latest
+COPY material-applications/example-backend /var/example-backend
+WORKDIR /var/example-backend/
+RUN ls
+RUN apt-get update && apt-get install -y ca-certificates openssl
+ARG cert_location=/usr/local/share/ca-certificates
+RUN openssl s_client -showcerts -connect github.com:443 </dev/null 2>/dev/null|openssl x509 -outform PEM > ${cert_location}/github.crt
+RUN openssl s_client -showcerts -connect proxy.golang.org:443 </dev/null 2>/dev/null|openssl x509 -outform PEM >  ${cert_location}/proxy.golang.crt
+RUN update-ca-certificates
+RUN apt-get install golang -y
+RUN go build .
+CMD ./server
+
+% docker build . --no-cache --progress=plain -t example-backend
+
+% docker images
+REPOSITORY                          TAG       IMAGE ID       CREATED          SIZE
+example-backend                     latest    7246870282f3   5 minutes ago    987MB
+
+% docker run -it -p 8888:8080 --name example-backend example-backend
+
+% curl -X GET 127.0.0.1:8888/ping
+pong%
