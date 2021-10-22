@@ -290,9 +290,9 @@ Submit the Dockerfile.
 # Here, I use apt-get cmd to install nodejs rather than the bash script
 % cat Dockerfile
 FROM debian:latest
-WORKDIR /var
-COPY material-applications/example-frontend .
-RUN ls
+ENV REACT_APP_BACKEND_URL http://127.0.0.1:8080/
+COPY material-applications/example-frontend /var/example-frontend
+WORKDIR /var/example-frontend
 RUN apt-get update
 RUN apt-get install curl gcc g++ make yarn nodejs npm -y
 RUN npm -v & node -v
@@ -300,6 +300,7 @@ RUN npm install
 RUN npm run build
 RUN npm install -g serve
 CMD serve -s -l 5000 build
+EXPOSE 5000
 
 % docker build . --no-cache --progress=plain -t example-frontend
 
@@ -319,10 +320,11 @@ When you start the container and navigate to http://localhost:8080/ping you shou
 Submit the Dockerfile and the command used.
 
 % cat Dockerfile
+% cat Dockerfile
 FROM debian:latest
+ENV REQUEST_ORIGIN http://127.0.0.1:5000
 COPY material-applications/example-backend /var/example-backend
 WORKDIR /var/example-backend/
-RUN ls
 RUN apt-get update && apt-get install -y ca-certificates openssl
 ARG cert_location=/usr/local/share/ca-certificates
 RUN openssl s_client -showcerts -connect github.com:443 </dev/null 2>/dev/null|openssl x509 -outform PEM > ${cert_location}/github.crt
@@ -331,6 +333,7 @@ RUN update-ca-certificates
 RUN apt-get install golang -y
 RUN go build .
 CMD ./server
+EXPOSE 8080
 
 % docker build . --no-cache --progress=plain -t example-backend
 
@@ -338,7 +341,17 @@ CMD ./server
 REPOSITORY                          TAG       IMAGE ID       CREATED          SIZE
 example-backend                     latest    7246870282f3   5 minutes ago    987MB
 
-% docker run -it -p 8888:8080 --name example-backend example-backend
+% docker run -it -p 8080:8080 --name example-backend example-backend
 
-% curl -X GET 127.0.0.1:8888/ping
+% curl -X GET 127.0.0.1:8080/ping
 pong%
+
+========================================Solution to 1.14: Environment========================================
+Start both frontend-example and backend-example with correct ports exposed and add ENV to Dockerfile with necessary information from both READMEs (front,back).
+Submit the edited Dockerfiles and commands used to run.
+
+# Docker(frontend, exposed 5000)--> browser(localhost)<---Docker(Backend, exposed 8080)
+# Repeat the steps in 1.12
+# Repeat the steps in 1.13
+# Input "http://127.0.0.1:5000/" in the browser, click "PRESS TO TEST!" button next to "Exercise 1.14" in the website, the following info can be seen:
+"Success! Great job!"
