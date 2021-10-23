@@ -1,0 +1,77 @@
+========================================Solution to 2.1========================================
+Without a command devopsdockeruh/simple-web-service will create logs into its /usr/src/app/text.log.
+Create a docker-compose.yml file that starts devopsdockeruh/simple-web-service and saves the logs into your filesystem.
+Submit the docker-compose.yml, make sure that it works simply by running docker-compose up if the log file exists.
+
+# Remember to create this file first **
+Terminal 1: % touch text.log
+
+Terminal 1: % cat docker-compose.yml
+version: '3.2'
+
+services:
+    simple-web-service:
+      image: devopsdockeruh/simple-web-service
+      build: .
+      volumes:
+        - ./text.log:/usr/src/app/text.log
+      container_name: simple-web-service
+
+Terminal 1: % tail -f text.log
+
+Terminal 2: % docker-compose up
+[+] Running 1/1
+ ⠿ Container simple-web-service  Recreated                                                                                      0.2s
+Attaching to simple-web-service
+simple-web-service  | Starting log output
+simple-web-service  | Wrote text to /usr/src/app/text.log
+simple-web-service  | Wrote text to /usr/src/app/text.log
+....
+
+Terminal 1: % tail -f text.log
+2021-10-23 12:04:05 +0000 UTC
+2021-10-23 12:04:07 +0000 UTC
+2021-10-23 12:04:09 +0000 UTC
+2021-10-23 12:04:11 +0000 UTC
+2021-10-23 12:04:13 +0000 UTC
+Secret message is: 'You can find the source code here: https://github.com/docker-hy'
+....
+
+========================================Solution to 2.2========================================
+The familiar image devopsdockeruh/simple-web-service can be used to start a web service.
+Create a docker-compose.yml and use it to start the service so that you can use it with your browser.
+Submit the docker-compose.yml, make sure that it works simply by running docker-compose up
+
+# Remember to create this file first **
+Terminal 1: % touch text.log
+
+Terminal 1: % cat docker-compose.yml
+version: '3.2'
+
+services:
+    simple-web-service:
+      image: devopsdockeruh/simple-web-service
+      working_dir: /usr/src/app/
+      build: .
+      volumes:
+        - ./text.log:/usr/src/app/text.log
+      command: server
+      ports:
+        - '8888:8080'
+      container_name: simple-web-service
+
+Terminal 1: % docker-compose up
+[+] Running 1/1
+ ⠿ Container simple-web-service  Recreated                                                                                      0.1s
+Attaching to simple-web-service
+simple-web-service  | [GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+simple-web-service  |
+simple-web-service  | [GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+simple-web-service  |  - using env:	export GIN_MODE=release
+simple-web-service  |  - using code:	gin.SetMode(gin.ReleaseMode)
+simple-web-service  |
+simple-web-service  | [GIN-debug] GET    /*path                    --> server.Start.func1 (3 handlers)
+simple-web-service  | [GIN-debug] Listening and serving HTTP on :8080
+
+Terminal 2: % curl 127.0.0.1:8888
+{"message":"You connected to the following path: /","path":"/"}%
