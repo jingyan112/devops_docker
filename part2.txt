@@ -75,3 +75,54 @@ simple-web-service  | [GIN-debug] Listening and serving HTTP on :8080
 
 Terminal 2: % curl 127.0.0.1:8888
 {"message":"You connected to the following path: /","path":"/"}%
+
+========================================Solution to 2.3========================================
+In the previous part we created Dockerfiles for both frontend and backend. Next, simplify the usage into one docker-compose.yml.
+Configure the backend and frontend from part 1 to work in docker-compose. Submit the docker-compose.yml
+
+% docker images
+REPOSITORY                          TAG       IMAGE ID       CREATED        SIZE
+example-backend-env                 latest    a43a04d205ab   23 hours ago   987MB
+example-frontend-env                latest    356aaf19396e   23 hours ago   1.21GB
+
+% cat docker-compose.yml
+version: '3.2'
+
+services:
+    frontend:
+      image: example-frontend-env
+      build: .
+      ports:
+        - '5000:5000'
+      container_name: frontend
+    backend:
+      image: example-backend-env
+      build: .
+      ports:
+        - '8080:8080'
+      container_name: backend
+
+% docker-compose up
+[+] Running 2/2
+ ⠿ Container backend   Recreated                                                                                                         0.2s
+ ⠿ Container frontend  Recreated                                                                                                         0.2s
+Attaching to backend, frontend
+backend   | [Ex 2.4+] REDIS_HOST env was not passed so redis connection is not initialized
+backend   | [Ex 2.6+] POSTGRES_HOST env was not passed so postgres connection is not initialized
+backend   | [GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+backend   |
+backend   | [GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+backend   |  - using env:	export GIN_MODE=release
+backend   |  - using code:	gin.SetMode(gin.ReleaseMode)
+backend   |
+backend   | [GIN-debug] GET    /ping                     --> server/router.pingpong (4 handlers)
+backend   | [GIN-debug] GET    /messages                 --> server/controller.GetMessages (4 handlers)
+backend   | [GIN-debug] POST   /messages                 --> server/controller.CreateMessage (4 handlers)
+backend   | [GIN-debug] Listening and serving HTTP on :8080
+frontend  | WARNING: Checking for updates failed (use `--debug` to see full error)
+frontend  | INFO: Accepting connections at http://localhost:5000
+
+# Input "http://127.0.0.1:5000/" in the browser, 
+Exercise 1.12: Congratulations! You configured your ports correctly!
+Click "PRESS TO TEST!" button next to "Exercise 1.14" in the website, the following info can be seen:
+"Success! Great job!"
