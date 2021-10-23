@@ -126,3 +126,76 @@ frontend  | INFO: Accepting connections at http://localhost:5000
 Exercise 1.12: Congratulations! You configured your ports correctly!
 Click "PRESS TO TEST!" button next to "Exercise 1.14" in the website, the following info can be seen:
 "Success! Great job!"
+
+========================================Solution to 2.4========================================
+Add redis to example backend. Redis is used to speed up some operations.
+Backend uses a slow api to get information. You can test the slow api by requesting /ping?redis=true with curl. The frontend program has a button to test this.
+Configure a redis container to cache information for the backend. Use the documentation if needed when configuring: https://hub.docker.com/_/redis/
+The backend README should have all the information needed to connect. When you’ve correctly configured the button will turn green.
+Submit the docker-compose.yml
+
+Note:
+# https://stackoverflow.com/questions/42360356/docker-redis-connection-refused
+# each docker compose container can access other container by using the service name as hostname. 
+
+% cat docker-compose.yml_bak
+version: '3.2'
+
+services:
+    frontend:
+      image: example-frontend-env
+      build: .
+      ports:
+        - '5000:5000'
+      container_name: frontend
+    backend:
+      image: example-backend-env
+      environment:
+          REDIS_HOST: redis
+      build: .
+      ports:
+        - '8080:8080'
+      container_name: backend
+      depends_on:
+        - redis
+    redis:
+      image: redis
+      build: .
+      ports:
+        - '6379:6379'
+      restart: unless-stopped
+      container_name: redis
+
+% docker-compose up
+[+] Running 3/3
+ ⠿ Container frontend  Created                                                                                                                        0.1s
+ ⠿ Container redis     Created                                                                                                                        0.1s
+ ⠿ Container backend   Created                                                                                                                        0.1s
+Attaching to backend, frontend, redis
+redis     | 1:C 23 Oct 2021 13:34:57.243 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+redis     | 1:C 23 Oct 2021 13:34:57.243 # Redis version=6.2.6, bits=64, commit=00000000, modified=0, pid=1, just started
+redis     | 1:C 23 Oct 2021 13:34:57.243 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+redis     | 1:M 23 Oct 2021 13:34:57.244 * monotonic clock: POSIX clock_gettime
+redis     | 1:M 23 Oct 2021 13:34:57.245 * Running mode=standalone, port=6379.
+redis     | 1:M 23 Oct 2021 13:34:57.245 # Server initialized
+redis     | 1:M 23 Oct 2021 13:34:57.246 * Ready to accept connections
+backend   | [Ex 2.4+] Initializing redis client
+backend   | [Ex 2.4+] Connection to redis initialized, ready to ping pong.
+backend   | [Ex 2.6+] POSTGRES_HOST env was not passed so postgres connection is not initialized
+backend   | [GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+backend   |
+backend   | [GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+backend   |  - using env:	export GIN_MODE=release
+backend   |  - using code:	gin.SetMode(gin.ReleaseMode)
+backend   |
+backend   | [GIN-debug] GET    /ping                     --> server/router.pingpong (4 handlers)
+backend   | [GIN-debug] GET    /messages                 --> server/controller.GetMessages (4 handlers)
+backend   | [GIN-debug] POST   /messages                 --> server/controller.CreateMessage (4 handlers)
+backend   | [GIN-debug] Listening and serving HTTP on :8080
+frontend  | INFO: Accepting connections at http://localhost:5000
+
+# Input "http://127.0.0.1:5000/" in the browser, 
+Click "PRESS TO TEST!" button next to "Exercise 2.4" in the website, the following info can be seen:
+"Nice! The exercise is complete!"
+
+# Input "http://127.0.0.1:8080/ping?redis=true" in the browser, "pong" can be seen in the website
