@@ -199,3 +199,13 @@ Click "PRESS TO TEST!" button next to "Exercise 2.4" in the website, the followi
 "Nice! The exercise is complete!"
 
 # Input "http://127.0.0.1:8080/ping?redis=true" in the browser, "pong" can be seen in the website
+
+========================================Solution to 2.5========================================
+A project over at https://github.com/docker-hy/material-applications/tree/main/scaling-exercise has a hardly working application. Go ahead and clone it for yourself. The project already includes docker-compose.yml so you can start it by running docker-compose up.
+Application should be accessible through http://localhost:3000. However it doesn’t work well enough and I’ve added a load balancer for scaling. Your task is to scale the compute containers so that the button in the application turns green.
+This exercise was created with Sasu Mäkinen, Please return the used commands for this exercise.
+
+From the README.md, "You just need to scale the compute service so that a large number of calculations gets distributed between a large number of compute services."
+Tested the following 2 cmds, both can see the "Congratulations!" after clicking "Press here to test your solution" in the browser with "127.0.0.1:3000".
+% docker-compose up --scale compute=3
+% docker-compose up --scale compute=2
