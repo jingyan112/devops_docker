@@ -209,3 +209,108 @@ From the README.md, "You just need to scale the compute service so that a large 
 Tested the following 2 cmds, both can see the "Congratulations!" after clicking "Press here to test your solution" in the browser with "127.0.0.1:3000".
 % docker-compose up --scale compute=3
 % docker-compose up --scale compute=2
+
+========================================Solution to 2.6========================================
+Add database to example backend. Lets use a postgres database to save messages.
+We won’t need to configure a volume since the official postgres image sets a default volume for us.
+Lets use the postgres image documentation to our advantage when configuring: https://hub.docker.com/_/postgres/.
+Especially part Environment Variables is of interest.
+The backend README should have all the information needed to connect.
+The button won’t turn green but you can send messages to yourself.
+Submit the docker-compose.yml
+
+% cat docker-compose.yml
+version: '3.2'
+
+services:
+    frontend:
+      image: example-frontend-env
+      build: .
+      ports:
+        - '5000:5000'
+      container_name: frontend
+    backend:
+      image: example-backend-env
+      environment:
+          REDIS_HOST: redis
+          POSTGRES_HOST: postgresdb
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DATABASE: postgres
+      build: .
+      ports:
+        - '8080:8080'
+      container_name: backend
+      depends_on:
+        - redis
+        - postgresdb
+    redis:
+      image: redis
+      build: .
+      ports:
+        - '6379:6379'
+      restart: unless-stopped
+      container_name: redis
+    postgresdb:
+      image: postgres:13.2-alpine
+      build: .
+      ports:
+        - '5432:5432'
+      restart: unless-stopped
+      container_name: postgresdb
+
+% docker-compose up
+[+] Running 4/4
+ ⠿ Container postgresdb  Recreated                                                                                        0.1s
+ ⠿ Container frontend    Created                                                                                          0.0s
+ ⠿ Container redis       Created                                                                                          0.0s
+ ⠿ Container backend     Recreated                                                                                        0.1s
+Attaching to backend, frontend, postgresdb, redis
+postgresdb  |
+postgresdb  | PostgreSQL Database directory appears to contain a database; Skipping initialization
+postgresdb  |
+redis       | 1:C 23 Oct 2021 14:07:11.121 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+redis       | 1:C 23 Oct 2021 14:07:11.122 # Redis version=6.2.6, bits=64, commit=00000000, modified=0, pid=1, just started
+redis       | 1:C 23 Oct 2021 14:07:11.123 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+redis       | 1:M 23 Oct 2021 14:07:11.124 * monotonic clock: POSIX clock_gettime
+redis       | 1:M 23 Oct 2021 14:07:11.126 * Running mode=standalone, port=6379.
+redis       | 1:M 23 Oct 2021 14:07:11.127 # Server initialized
+redis       | 1:M 23 Oct 2021 14:07:11.128 * Ready to accept connections
+postgresdb  | 2021-10-23 14:07:11.138 UTC [1] LOG:  starting PostgreSQL 13.2 on x86_64-pc-linux-musl, compiled by gcc (Alpine 10.2.1_pre1) 10.2.1 20201203, 64-bit
+postgresdb  | 2021-10-23 14:07:11.138 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+postgresdb  | 2021-10-23 14:07:11.138 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+postgresdb  | 2021-10-23 14:07:11.144 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+postgresdb  | 2021-10-23 14:07:11.150 UTC [23] LOG:  database system was interrupted; last known up at 2021-10-23 14:04:01 UTC
+postgresdb  | 2021-10-23 14:07:11.378 UTC [23] LOG:  database system was not properly shut down; automatic recovery in progress
+postgresdb  | 2021-10-23 14:07:11.380 UTC [23] LOG:  redo starts at 0/15D4AA8
+postgresdb  | 2021-10-23 14:07:11.384 UTC [23] LOG:  invalid record length at 0/15F4438: wanted 24, got 0
+postgresdb  | 2021-10-23 14:07:11.384 UTC [23] LOG:  redo done at 0/15F4400
+postgresdb  | 2021-10-23 14:07:11.416 UTC [1] LOG:  database system is ready to accept connections
+frontend    | INFO: Accepting connections at http://localhost:5000
+backend     | [Ex 2.4+] Initializing redis client
+backend     | [Ex 2.4+] Connection to redis initialized, ready to ping pong.
+backend     | [Ex 2.6+] Initializing postgres connection with envs
+backend     | 		POSTGRES_HOST      postgresdb,
+backend     | 		POSTGRES_USER:     postgres,
+backend     | 		POSTGRES_PASSWORD: postgres,
+backend     | 		POSTGRES_DATABASE: postgres
+backend     | 		to postgresdb:5432
+postgresdb  | 2021-10-23 14:07:12.126 UTC [30] ERROR:  relation "messages" already exists
+postgresdb  | 2021-10-23 14:07:12.126 UTC [30] STATEMENT:  CREATE TABLE "messages" ("id" bigserial, "body" text, PRIMARY KEY ("id"))
+backend     | [Ex 2.6+] Connection to postgres initialized, ready to ping pong.
+backend     | [GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+backend     |
+backend     | [GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+backend     |  - using env:	export GIN_MODE=release
+backend     |  - using code:	gin.SetMode(gin.ReleaseMode)
+backend     |
+backend     | [GIN-debug] GET    /ping                     --> server/router.pingpong (4 handlers)
+backend     | [GIN-debug] GET    /messages                 --> server/controller.GetMessages (4 handlers)
+backend     | [GIN-debug] POST   /messages                 --> server/controller.CreateMessage (4 handlers)
+backend     | [GIN-debug] Listening and serving HTTP on :8080
+backend     | [GIN] 2021/10/23 - 14:07:25 | 200 |      5.3167ms |      172.24.0.1 | POST     "/messages"
+backend     | [GIN] 2021/10/23 - 14:07:25 | 200 |      2.5157ms |      172.24.0.1 | GET      "/messages"
+
+# Input "http://127.0.0.1:5000/" in the browser, click "PRESS TO TEST!" button next to "Exercise 2.6" in the website, the following info can be seen:
+"Working! Messages below also work."
+Plus, the msg can be shown below the Exercise 2.6 after inputing the msg and click "SEND MESSAGE!"
