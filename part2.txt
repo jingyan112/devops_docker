@@ -314,3 +314,50 @@ backend     | [GIN] 2021/10/23 - 14:07:25 | 200 |      2.5157ms |      172.24.0.
 # Input "http://127.0.0.1:5000/" in the browser, click "PRESS TO TEST!" button next to "Exercise 2.6" in the website, the following info can be seen:
 "Working! Messages below also work."
 Plus, the msg can be shown below the Exercise 2.6 after inputing the msg and click "SEND MESSAGE!"
+
+========================================Solution to 2.7========================================
+Configure a machine learning project.
+Look into machine learning project created with Python and React and split into three parts: frontend, backend and training
+Note that the training requires 2 volumes and backend should share volume /src/model with training.
+The frontend will display on http://localhost:3000 and the application will tell if the subject of an image looks more like a cucumber or a moped.
+Submit the docker-compose.yml
+
+% git clone https://github.com/docker-hy/ml-kurkkumopo-frontend.git
+% git clone https://github.com/docker-hy/ml-kurkkumopo-backend.git
+% git clone https://github.com/docker-hy/ml-kurkkumopo-training.git
+
+% cat docker-compose.yml
+version: "3.8"
+
+services:
+    frontend:
+      build: ./ml-kurkkumopo-frontend
+      ports:
+        - "3000:3000"
+      container_name: frontend
+
+    backend:
+      build: ./ml-kurkkumopo-backend
+      ports:
+        - "5000:5000"
+      volumes:
+        - model:/src/model
+      depends_on:
+        - training
+      container_name: backend
+
+    training:
+      build: ./ml-kurkkumopo-training
+      volumes:
+        - imgs:/src/imgs
+        - data:/src/data
+        - model:/src/model
+      container_name: training
+
+volumes:
+  imgs:
+  data:
+  model:
+
+Browse "127.0.0.1:3000" with the following picture, will get "90.93% sure this is a cucumber"
+https://images.app.goo.gl/AypEu3WD7qDV2RBK6
