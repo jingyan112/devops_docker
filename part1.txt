@@ -320,7 +320,6 @@ When you start the container and navigate to http://localhost:8080/ping you shou
 Submit the Dockerfile and the command used.
 
 % cat Dockerfile
-% cat Dockerfile
 FROM debian:latest
 ENV REQUEST_ORIGIN http://127.0.0.1:5000
 COPY material-applications/example-backend /var/example-backend
