@@ -362,7 +362,7 @@ volumes:
 Browse "127.0.0.1:3000" with the following picture, will get "90.93% sure this is a cucumber"
 https://images.app.goo.gl/AypEu3WD7qDV2RBK6
 
-========================================Solution to 2.8========================================
+========================================Solution to 2.8, 2.9 and 2.10========================================
 Accessing your service from arbitrary port is counter intuitive since browsers use 80 (http) and 443 (https) by default. And having the service refer to two origins in a case where there’s only one backend isn’t desirable either. We will skip the SSL setup for https/443.
 Nginx will function as a reverse proxy for us (see the image above). The requests arriving at anything other than /api will be redirected to frontend container and /api will get redirected to backend container.
 At the end you should see that the frontend is accessible simply by going to http://localhost and the button works. Other buttons may have stopped working, do not worry about them.
@@ -436,7 +436,7 @@ services:
       ports:
         - 5000:5000
       environment:
-          REACT_APP_BACKEND_URL: http://127.0.0.1:8080
+          REACT_APP_BACKEND_URL: http://127.0.0.1:80/api
       container_name: frontend
       depends_on:
         - backend
@@ -446,7 +446,6 @@ services:
       ports:
         - 8080:8080
       environment:
-          REQUEST_ORIGIN: http://127.0.0.1:5000
           REDIS_HOST: redis
           POSTGRES_HOST: postgresdb
           POSTGRES_USER: postgres
@@ -461,6 +460,8 @@ services:
       image: redis
       ports:
         - 6379:6379
+      volumes:
+        - ./redis:/data
       restart: unless-stopped
       container_name: redis
 
@@ -469,13 +470,16 @@ services:
       ports:
         - 5432:5432
       environment:
+          POSTGRES_HOST: postgresdb
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DATABASE: postgres
+      volumes:
+        - ./database:/var/lib/postgresql/data
       restart: unless-stopped
       container_name: postgresdb
 
+Exercise 1.12; 1.14; 2.4; 2.6 works "http://127.0.0.1:5000/api/ping"
+Exercise 1.12; 2.8 works "http://127.0.0.1/"
 % curl http://127.0.0.1/api/ping
 pong%
-
-Browse "http://127.0.0.1/", click the "PRESS TO TEST!" next to "Exercise 2.8", "Nice! The exercise is complete!" can be seen.
